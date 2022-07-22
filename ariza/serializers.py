@@ -53,3 +53,4 @@ class ArizaSerializer(serializers.ModelSerializer):
         date = obj.created_at.strftime("%d.%m.%Y")
         return date
 
+

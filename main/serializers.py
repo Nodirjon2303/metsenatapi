@@ -154,3 +154,5 @@ class HomiySerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"status": " error Homiy hali tasdiqlanmagan"})
 
         return super(HomiySerializer, self).create(validated_data)
+
+

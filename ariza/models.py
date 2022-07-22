@@ -11,8 +11,8 @@ class Ariza(models.Model):
         ('cancel', "Bekor qilingan")
     )
     payment_type_options = (
-        ("exchange", "Pul O'tqazmalari"),
         ("cash", "Naqt to'lov"),
+        ("exchange", "Pul O'tqazmalari"),
         ("None", "None")
     )
     fish = models.CharField(max_length=255)

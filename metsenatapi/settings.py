@@ -22,9 +22,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-j3&xlfkcptm4r#y3wzj8n85&12s4&@s+mrw8cs4*r%2z!8u0o1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['metsenat1.uz', '.metsenat1.uz']
+ALLOWED_HOSTS = ['metsenat1.uz', '.metsenat1.uz', '127.0.0.1']
 
 # Application definition
 
@@ -146,7 +146,7 @@ STATICFILES_DIRS = [
 ]
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-TIME_ZONE = 'Asia/Tashkent'
+TIME_ZONE = 'UTC'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

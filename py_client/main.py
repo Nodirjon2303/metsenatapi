@@ -1,49 +1,25 @@
 import requests
-from jwt_client import jwt_client
+from faker import Faker
+from random import randint, choice
+from faker.providers import company
 
+username = input('username')
+password = input('password')
+r = requests.post("https://senat.metsenat1.uz/api/token/", data={'username': username, 'password': password})
+if r.status_code == 200:
+    access = r.json()['access']
+    fake = Faker()
+    fakecompany = Faker()
+    fakecompany.add_provider(company)
 
-def write_tokens(data):
-    f = open('jwt_client.py', 'w')
-    f.write(f"jwt_client = {data}")
-    f.close()
-def renew_token():
-    username = input('username')
-    password = input('password')
-    r = requests.post("http://localhost:8000/api/token/", data={'username': username, 'password': password})
-    if r.status_code == 200:
-        jwt_client = r.json()
-        write_tokens(jwt_client)
-    else:
-        print(r.json())
-    print(r.status_code)
-    
+    headers = {"Authorization": f"Bearer {access}"}
 
-access_token = jwt_client.get('access')
-if access_token:
-    headers = {'Authorization': f'Bearer {access_token}'}
-    r = requests.get("http://localhost:8000/api/university/", headers=headers)
-    print("university ", r.status_code, r.json())
-    if r.status_code != 200:
+    for i in range(105):
+        homiy = randint(2, 175)
         data = {
-            'refresh': jwt_client.get('refresh')
+            "amount": randint(1, 3) * 10 ** 5,
+            "homiy": homiy,
+            "student": randint(1, 151)
         }
-        r = requests.post("http://localhost:8000/api/token/refresh/", json=data)
-        if r.status_code == 200:
-            write_tokens(r.json())
-        else:
-            renew_token()
-        print(r.status_code, r.json())
-
-
-else:
-    while True:
-        username = input('username')
-        password = input('password')
-        r = requests.post("http://localhost:8000/api/token/", data={'username': username, 'password': password})
-        if r.status_code == 200:
-            jwt_client = r.json()
-            write_tokens(jwt_client)
-            break
-        else:
-            print(r.json())
-print(jwt_client)
+        r = requests.post("https://senat.metsenat1.uz/api/homiy/", headers=headers, json=data)
+        print(r.json())
