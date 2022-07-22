@@ -42,7 +42,6 @@ class ArizaSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
-        print(validated_data, instance)
         all_spent = sum([i.amount for i in Homiy.objects.filter(homiy=instance)])
         if all_spent > validated_data.get('amount'):
             raise serializers.ValidationError({"amount": f"already {all_spent} sum spent"})

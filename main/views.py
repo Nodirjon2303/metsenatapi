@@ -23,6 +23,7 @@ class StudentApiView(viewsets.ModelViewSet):
 class HomiyApiView(viewsets.ModelViewSet):
     queryset = Homiy.objects.all()
     serializer_class = HomiySerializer
+    pagination_class = None
 
 
 class ArizaApiView(viewsets.ModelViewSet):
