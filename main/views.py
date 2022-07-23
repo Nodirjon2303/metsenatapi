@@ -63,8 +63,10 @@ class DashboardView(generics.ListAPIView):
         start_date = datetime.datetime(year=today.year, month=1, day=1)
         month = []
         while start_date <= today:
-            homiy_day = Ariza.objects.filter(created_at__lte=start_date).count()
-            student_day = Student.objects.filter(created_at__lte=start_date).count()
+            homiy_day = Ariza.objects.filter(created_at__day=start_date.day, created_at__month=start_date.month,
+                                             created_at__year=start_date.year).count()
+            student_day = Student.objects.filter(created_at__day=start_date.day, created_at__month=start_date.month,
+                                                 created_at__year=start_date.year).count()
             month.append({
                 'day': start_date.day,
                 'homiy': homiy_day,
@@ -74,23 +76,27 @@ class DashboardView(generics.ListAPIView):
                 data.append({
                     'name': month_names[start_date.month],
                     'days': month,
-                    'homiy': month[-1]['homiy'],
-                    'student': month[-1]['student']
+                    'homiy': Ariza.objects.filter(created_at__gte=(start_date - datetime.timedelta(days=len(month))),
+                                                  created_at__lte=start_date),
+                    'student': Student.objects.filter(
+                        created_at__gte=(start_date - datetime.timedelta(days=len(month))), created_at__lte=start_date),
                 })
                 month = []
-            start_date+=datetime.timedelta(days=1)
+            start_date += datetime.timedelta(days=1)
         if month:
             data.append({
                 'name': month_names[start_date.month],
                 'days': month,
-                'homiy': month[-1]['homiy'],
-                'student': month[-1]['student']
+                'homiy': Ariza.objects.filter(created_at__gte=(start_date - datetime.timedelta(days=len(month))),
+                                              created_at__lte=start_date),
+                'student': Student.objects.filter(created_at__gte=(start_date - datetime.timedelta(days=len(month))),
+                                                  created_at__lte=start_date),
             })
         response_data = {
             "all_paid": sum([i.amount for i in Homiy.objects.all()]),
             'all_asked': sum([i.kontrakt for i in Student.objects.all()]),
             'must_pay': sum([i.amount for i in Homiy.objects.all()]) - sum([i.kontrakt for i in Student.objects.all()]),
-            'homiy': Ariza.objects.filter(created_at__lt=today).count(),
+            'homiy': Ariza.objects.filter(created_at__lte=today).count(),
             'student': Student.objects.filter(created_at__lte=today).count(),
             'monthly': data
         }
