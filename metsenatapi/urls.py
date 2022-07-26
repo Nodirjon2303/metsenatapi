@@ -25,6 +25,25 @@ from django.conf import settings
 from django.conf.urls.static import static
 from main.views import DashboardView
 
+
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+
+schema_view = get_schema_view(
+   openapi.Info(
+      title="Metsenat api",
+      default_version='v1',
+      description="Metsenat uchun saytni api endpointlari",
+      terms_of_service="www.uic.group",
+      contact=openapi.Contact(email="ruzimurodovnodir66@gmail.com"),
+      license=openapi.License(name="UIC License"),
+   ),
+   public=True,
+   permission_classes=[permissions.AllowAny],
+)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('ariza/', include('ariza.urls')),
@@ -32,8 +51,9 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
-    path('api/dashboard/', DashboardView.as_view(), name='dashboard')
+    path('api/dashboard/', DashboardView.as_view(), name='dashboard'),
+    path(r'swagger(?P<format>\.json|\.yaml)$', schema_view.with_ui(cache_timeout=0), name='schema-json'),
+    path(r'swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path(r'redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc')
 ]
 
-urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

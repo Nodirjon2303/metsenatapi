@@ -22,9 +22,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-j3&xlfkcptm4r#y3wzj8n85&12s4&@s+mrw8cs4*r%2z!8u0o1'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = ['metsenat1.uz', '.metsenat1.uz', "165.232.133.231", ]
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -38,11 +38,11 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
     'rest_framework',
+    'drf_yasg',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
-
     'ariza',
-    'main',
+    'main'
 ]
 
 REST_FRAMEWORK = {
@@ -55,7 +55,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     "PAGE_SIZE": 10,
-    "DEFAULT_FILTER_BACKENDS": ['django_filters.rest_framework.DjangoFilterBackend']
+    "DEFAULT_FILTER_BACKENDS": ['django_filters.rest_framework.DjangoFilterBackend'],
+    'EXCEPTION_HANDLER': 'metsenatapi.exceptionHandler.handle',
 }
 
 MIDDLEWARE = [

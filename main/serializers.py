@@ -69,11 +69,7 @@ class StudentSerializer(serializers.ModelSerializer):
             'created_date',
         ]
 
-    def update(self, instance, validated_data):
-        paid = sum([i.amount for i in Homiy.objects.filter(student=instance)])
-        if paid > validated_data.get('kontrakt'):
-            raise serializers.ValidationError({'kontrakt': f"Already {paid} is paid for student kontrakt "})
-        return super().update(instance, validated_data)
+
 
     def get_homiylar(self, obj):
         homiylar = Homiy.objects.filter(student=obj)
@@ -84,7 +80,7 @@ class StudentSerializer(serializers.ModelSerializer):
         return date
 
     def get_paid(self, obj):
-        paid = sum([i.amount for i in Homiy.objects.filter(student=obj)])
+        paid = Homiy.objects.filter(student=obj).aggregate(Sum('amount')).get('amount__sum')
         return paid
 
 
@@ -119,40 +115,7 @@ class HomiySerializer(serializers.ModelSerializer):
                                       context={'request': self.context.get('request')}).data
         return homiy
 
-    def update(self, instance, validated_data):
-        print(validated_data)
-        paid = sum([i.amount for i in Homiy.objects.filter(student=validated_data.get('student'))]) - instance.amount
-        if paid + self.validated_data.get('amount') > instance.student.kontrakt:
-            raise serializers.ValidationError(
-                {"status": f"error Summa talabani kontaktidan oshib ketdi",
-                 "maximum": instance.student.kontrakt - paid})
-        all_spent = sum([i.amount for i in Homiy.objects.filter(homiy=validated_data.get('homiy'))]) - instance.amount
-        if all_spent + validated_data.get('amount') > instance.homiy.amount:
-            raise serializers.ValidationError(
-                {"status": f"error amount homiyning mablag'idan oshib ketdi",
-                 "maximum": instance.homiy.amount - all_spent})
-        homiy = validated_data.get('homiy')
-        if homiy.status != 'tasdiqlangan':
-            raise serializers.ValidationError({"status": " error Homiy hali tasdiqlanmagan"})
-        return super().update(instance, validated_data)
-
-    def create(self, validated_data):
-        homiy = validated_data.get("homiy")
-        student = validated_data.get('student')
-        amount = validated_data.get('amount')
-        all_spent = sum([i.amount for i in Homiy.objects.filter(homiy=homiy)])
-        if all_spent + amount > homiy.amount:
-            raise serializers.ValidationError(
-                {"status": f"error amount homiyning mablag'idan oshib ketdi",
-                 "maximum": homiy.amount - all_spent})
-        paid = sum([i.amount for i in Homiy.objects.filter(student=validated_data.get('student'))])
-        if paid + self.validated_data.get('amount') > student.kontrakt:
-            raise serializers.ValidationError(
-                {"status": f"error Summa talabani kontaktidan oshib ketdi",
-                 "maximum": student.kontrakt - paid})
-        if homiy.status != 'tasdiqlangan':
-            raise serializers.ValidationError({"status": " error Homiy hali tasdiqlanmagan"})
-
-        return super(HomiySerializer, self).create(validated_data)
+    
+    
 
 

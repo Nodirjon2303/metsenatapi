@@ -3,6 +3,7 @@ from .models import Ariza
 from main.models import Homiy
 from rest_framework.reverse import reverse
 from .validators import *
+from django.db.models import Sum
 
 class ArizaSerializer(serializers.ModelSerializer):
     spent = serializers.SerializerMethodField(read_only=True)
@@ -31,23 +32,9 @@ class ArizaSerializer(serializers.ModelSerializer):
         ]
 
     def get_spent(self, obj):
-        spent = sum([i.amount for i in Homiy.objects.filter(homiy=obj)])
+        spent = Homiy.objects.filter(homiy=obj).aggregate(Sum('amount')).get("amount__sum")
         return spent
 
-    def create(self, validated_data):
-        type = validated_data.get('type')
-        tashkilot = validated_data.get('tashkilot')
-        if type == 'yuridik' and not tashkilot:
-            raise serializers.ValidationError({"tashkilot": "tashkilot is required for yuridik user"})
-        return super().create(validated_data)
-
-    def update(self, instance, validated_data):
-        all_spent = sum([i.amount for i in Homiy.objects.filter(homiy=instance)])
-        if all_spent > validated_data.get('amount'):
-            raise serializers.ValidationError({"amount": f"already {all_spent} sum spent"})
-        if all_spent > 0 and validated_data.get('status') != 'tasdiqlangan':
-            raise serializers.ValidationError({"status": "status must be tasdiqlangan in this user who  spent money"})
-        return super().update(instance, validated_data)
 
     def get_created_date(self, obj):
         date = obj.created_at.strftime("%d.%m.%Y")
